@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&family=Work+Sans:wght@400;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Montserrat', sans-serif;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        background: #000;
+        position: relative;
+        text-align: center;
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+      }
+
+      h1 {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+        color: #ffffff;
+      }
+
+      p {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        color: #ffffff;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #1aff00;
+        color: #000000;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: 0.3s;
+      }
+
+      .btn:hover {
+        background-color: #fff;
+        color: #ff0000;
+      }
+
+      .social-links img {
+        margin: 10px;
+        width: 30px;
+        height: 30px;
+        transition: 0.3s;
+      }
+
+      .social-links img:hover {
+        transform: scale(1.1);
+      }
+
+      .social-links {
+        margin-top: 20px;
+      }
+
+      footer {
+        position: absolute;
+        bottom: 10px;
+        color: #cdced5;
+        font-size: 0.875rem;
+      }
+
+      footer a {
+        color: #797edc;
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe 
+  src="https://theorg.com/org/labxsena/embed" 
+  width="20%" 
+  height="50%" 
+  frameBorder="0" 
+  style="border: 1px solid #00ff00; border-radius: 4px;"> 
+</iframe>
+
+    <canvas id="stars"></canvas>
+
+    <main>
+      <h1>404</h1>
+      <p>Oops! The page you're looking for doesn't exist.🪖</p>
+      <a href="/" class="btn">Go Home 🏠</a>
+
+      <!-- Social Links -->
+      <div class="social-links">
+        <a href="https://github.com/erpranjalmishra" target="_blank"
+          ><img src="./asset/svg/github.svg" alt="GitHub"
+        /></a>
+        <a href="https://www.linkedin.com/in/erpranjalmishra/" target="_blank"
+          ><img src="./asset/svg/linkedin.svg" alt="LinkedIn"
+        /></a>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      © <script>document.write(new Date().getFullYear());</script> Built by <a href="https://github.com/erpranjalmishra">erpranjalmishra</a>
+    </footer>
+
+    <script>
+      const canvas = document.getElementById('stars');
+      const ctx = canvas.getContext('2d');
+      let stars = [];
+      let numberOfStars = 200;
+      let mouse = { x: null, y: null };
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Star object
+      function Star(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.radius = Math.random() * 1.5;
+        this.opacity = Math.random();
+        this.speedX = 0;
+        this.speedY = 0;
+        this.trail = [];
+      }
+
+      // Draw star with trail
+      Star.prototype.draw = function () {
+        // Draw trail
+        for (let i = 0; i < this.trail.length; i++) {
+          ctx.beginPath();
+          ctx.arc(this.trail[i].x, this.trail[i].y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(192, 192, 192, ${1 - i / this.trail.length})`; // Silver trail
+          ctx.fill();
+        }
+
+        // Draw star
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(192, 192, 192, ${this.opacity})`; // Silver star
+        ctx.fill();
+      };
+
+      // Update star position and trail
+      Star.prototype.update = function () {
+        // Add current position to the trail
+        this.trail.unshift({ x: this.x, y: this.y });
+        if (this.trail.length > 20) {
+          this.trail.pop(); // Limit the trail length
+        }
+
+        // Move the star
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        // Fade and stop the star after interaction
+        this.speedX *= 0.98;
+        this.speedY *= 0.98;
+        this.opacity *= 0.98;
+
+        // Reset star when it fades out
+        if (this.opacity < 0.1) {
+          this.reset();
+        }
+      };
+
+      // Reset star position
+      Star.prototype.reset = function () {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.z = Math.random() * canvas.width;
+        this.radius = Math.random() * 1.5;
+        this.opacity = Math.random();
+        this.speedX = 0;
+        this.speedY = 0;
+        this.trail = [];
+      };
+
+      // Initialize stars
+      function init() {
+        for (let i = 0; i < numberOfStars; i++) {
+          const star = new Star(
+            Math.random() * canvas.width,
+            Math.random() * canvas.height,
+            Math.random() * canvas.width
+          );
+          stars.push(star);
+        }
+      }
+
+      // Animate stars
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Update and draw stars
+        for (let i = 0; i < stars.length; i++) {
+          stars[i].update();
+          stars[i].draw();
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      // On mouse move, interact with stars
+      window.addEventListener('mousemove', (event) => {
+        mouse.x = event.clientX;
+        mouse.y = event.clientY;
+
+        for (let i = 0; i < stars.length; i++) {
+          const distX = mouse.x - stars[i].x;
+          const distY = mouse.y - stars[i].y;
+          const distance = Math.sqrt(distX * distX + distY * distY);
+
+          // If close to mouse, push star and make it a comet
+          if (distance < 100) {
+            stars[i].speedX = distX * 0.05;
+            stars[i].speedY = distY * 0.05;
+            stars[i].opacity = 1; // Brighten the star when interacting
+          }
+        }
+      });
+
+      // Resize canvas on window resize
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+
+      init();
+      animate();
+    </script>
+  </body>
+</html>

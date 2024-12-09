@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="A website for Pranjal Mishra. I’m a student currently pursuing my bachelor's degree in Computer Science. I’m passionate about developing products that make people's lives easier and more enjoyable."/>
+    <title>Pranjal Mishra</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#000000" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&family=Work+Sans:wght@400;800&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&family=Work+Sans:wght@400;800&display=swap"
+        rel="stylesheet"
+        type="text/css"
+      />
+    </noscript>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <style>
+      /* Gallery Styles */
+.gallery-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding-top: 5vh;
+  margin: 0 auto; /* Center horizontally */
+  max-width: 200px;
+  display: grid;
+  flex-direction: row;
+  justify-content: space-around;
+  gap: 10px;
+  padding: 1px;
+  border-radius: 5px;
+}
+
+.gallery-item {
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.gallery-item img:hover {
+  transform: scale(1.1);
+}
+  
+   
+
+    .gallery-item {
+      flex: 0 0 auto;
+      border-radius: auto;
+      cursor: pointer;
+      transition: border-color 3s ease;
+      scroll-snap-align: start;
+    }
+
+    .gallery-item:hover {
+      border-color: #21f500; /* Green border on hover */
+    }
+
+    .gallery-item img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      object-fit: grayscale;
+    }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Montserrat', sans-serif;
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: #000000;
+        position: relative;
+        text-align: center;
+      }
+      #popup {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #000000cc;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      display: none;
+      align-items: center;
+    }
+
+    #popup button {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    /* Play Button Styles */
+    #playButton {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #000;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+      /* Canvas for star animation */
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+      }
+
+      /* Navigation */
+      nav {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(10px);
+            z-index: 5;
+         }
+
+      nav ul {
+            display: flex;
+            justify-content: center;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+       }
+
+       nav ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+
+    </style>
+  </head>
+
+  <body>
+<!-- Audio element -->
+<audio id="backgroundMusic" src="1.mp3" preload="auto" autoplay></audio>
+
+<!-- Popup -->
+<div id="popup">
+  <span id="popupMessage">playing</span>
+  <button id="muteButton">🔊</button>
+</div>
+
+
+
+<!-- Play Button -->
+<div id="playButton">scroll and click on 📢</div>
+
+<script>
+  // Function to play audio
+  function playMusic() {
+    const audio = document.getElementById('backgroundMusic');
+    audio.play().catch((error) => {
+      console.log('Autoplay was prevented:', error);
+    });
+  }
+
+  // Function to toggle mute/unmute
+  function toggleMute() {
+    const audio = document.getElementById('backgroundMusic');
+    const button = document.getElementById('muteButton');
+    const message = document.getElementById('popupMessage');
+    
+    if (audio.muted) {
+      audio.muted = false;
+      button.textContent = '🔊'; // Volume icon
+      message.textContent = 'Music is playing';
+    } else {
+      audio.muted = true;
+      button.textContent = '🔇'; // Mute icon
+      message.textContent = 'Music is muted';
+    }
+  }
+
+  // Function to hide popup
+  function hidePopup() {
+    document.getElementById('popup').style.display = 'none';
+  }
+
+  // Add event listener to mute button
+  document.getElementById('muteButton').addEventListener('click', toggleMute);
+
+  // Add event listener to play button
+  document.getElementById('playButton').addEventListener('click', function() {
+    playMusic();
+    document.getElementById('playButton').style.display = 'none'; // Hide play button after music starts
+    document.getElementById('popup').style.display = 'flex'; // Show popup
+  });
+
+  // Add event listener to audio element
+  document.getElementById('backgroundMusic').addEventListener('ended', hidePopup);
+</script>
+
+    <!-- Starry Background Canvas -->
+    <canvas id="stars"></canvas>
+
+    <!-- Navigation -->
+    <nav>
+      <ul>
+        <li><a href="#top">HOME</a></li>
+        <li><a href="#project">PROJECTS</a></li>
+        <li><a href="#about">ABOUT</a></li>
+      </ul>
+    </nav>
+    <!-- End of Navigation -->
+
+    <!-- Home -->
+    <section class="center">
+      <main>
+        <!-- img and info container -->
+        <div class="img-info-container">
+          <!-- profile picture -->
+          <div class="img-container">
+            <img
+              width="80"
+              height="80"
+              src="./asset/img/milo.png"
+              alt="pfp"
+            />
+          </div>
+
+          <!-- info / the large text and social media -->
+          <div class="info-container">
+            <!-- svg/social media container -->
+            <div class="social-container">
+              <!-- GITHUB -->
+              <a href="https://github.com/erpranjalmishra" target="_blank"
+                ><img
+                  width="24"
+                  height="24"
+                  src="./asset/svg/github.svg"
+                  alt="github"
+              /></a>
+
+              <!-- LINKEDIN -->
+              <a
+                href="https://www.linkedin.com/in/erpranjalmishra/"
+                target="_blank"
+                ><img
+                  width="24"
+                  height="24"
+                  src="./asset/svg/linkedin.svg"
+                  alt="linkedin"
+              /></a>
+            </div>
+
+            <!-- name -->
+            <h1>pRANJAL mISHRA</h1>
+            <hr />
+          </div>
+        </div>
+
+        <p class="user-bio">
+          I’m a Student currently pursuing my bachelor's degree in Computer
+          Science. I’m passionate about developing products that make people's lives
+          easier and miserable.
+        </p>
+
+        <div class="quote-container">
+          <p>
+            <i>
+              It Is Very Easy To Defeat Someone, But It Is Very Hard To Win Someone       — <b>Dr.APJ Abdul Kalam</b>
+            </i>
+          </p>
+        </div>
+      </quote-container>
+    </section>
+    <!-- End of Home -->
+
+    <!-- Start of Project -->
+    <section class="center">
+      <div id="project">
+      <h2 onmouseover="this.style.color='lightblue'" onmouseleave="this.style.color='#cdced5'">PROJECTS</h2>
+      <!-- project container/ grid -->
+      <div class="project-container">
+          <!-- Repo -->
+          <div class="repository-container">
+            <div class="repository-head">
+              <a
+                href="https://github.com/erpranjalmishra"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <h3>Flick Tickets</h3>
+              </a>
+              <a
+                href="https://github.com/erpranjalmishra"
+                target="_blank"
+                rel="noopener noreferrer"
+                ><img
+                  width="16"
+                  height="16"
+                  src="./asset/svg/external-link.svg"
+                  alt="external-link"
+              /></a>
+            </div>
+
+            <p class="repository-description">
+              Sign <div class="repository-description">
+                <img src="/asset/img/qw.png" alt="Small Image" style="max-width: 100px; cursor: pointer; border-radius: 10px;" onclick="window.open(this.src, '_blank')" />
+              </div>in and book tickets for your favorite movies.
+            </p>
+            <div class="repository-language-used-container">
+              <span class="language-used">Java</span>
+              <span class="language-used">Swing</span>
+              <span class="language-used">MySQL</span>
+             
+          
+          </div>
+          </div>
+          <!-- Repo End -->
+          <!-- Repo -->
+          <div class="repository-container">
+            <div class="repository-head">
+              <a
+                href="https://github.com/erpranjalmishra
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <h3>Finally Elections!</h3>
+              </a>
+              <a
+                href="https://github.com/erpranjalmishra"
+                target="_blank"
+                rel="noopener noreferrer"
+                ><img
+                  width="16"
+                  height="16"
+                  src="./asset/svg/external-link.svg"
+                  alt="external-link"
+              /></a>
+            </div>
+
+            <p class="repository-description">A simple voting system with security.</p>
+            <div class="repository-language-used-container">
+              <span class="language-used">C</span>
+              <span class="language-used">MySQL</span>
+              <span class="language-used"></span>
+            </div>
+          </div>
+          <!-- Repo End -->
+          <!-- Repo -->
+          <div class="repository-container">
+            <div class="repository-head">
+              <a
+                href="https://buneri.eu/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <h3>Buneri</h3>
+              </a>
+              <a
+                href="https://buneri.eu/
+                target="_blank"
+                rel="noopener noreferrer"
+                ><img
+                  width="16"
+                  height="16"
+                  src="./asset/svg/external-link.svg"
+                  alt="external-link"
+              /></a>
+            </div>
+
+            <p class="repository-description">A clothing website designed on shopify</p>
+            <div class="repository-language-used-container">
+              <span class="language-used">HTML</span>
+              <span class="language-used">Javascript</span>
+              <span class="language-used">CSS</span>
+              <span class="language-used">Bootstrap</span>
+
+            </div>
+          </div>
+          <!-- Repo End -->
+          
+        </div>
+
+        <!-- To github repos -->
+        <div class="repository-container more-repo">
+          more at
+          <a
+            href="https://github.com/erpranjalmishra?tab=repositories"
+            target="_blank"
+            >GITHUB <img src="./asset/svg/external-link.svg" alt=""
+          /></a>
+        </div>
+        <!-- To github repos End-->
+      </div>
+    </section>
+    <!-- End of Project -->
+
+
+<!-- Certifications -->
+<section id="certifications">
+  <h2>Certifications</h2>
+  <div class="certifications-container">
+    <div class="certification-container">
+      <div class="certification-head">
+        <a href="https://www.edx.org/course/cs50s-introduction-to-computer-science" target="_blank" rel="noopener noreferrer">
+          <h3>CS50's Web Programming with Python and JavaScript</h3>
+        </a>
+        <a href="https://www.edx.org/course/cs50s-introduction-to-computer-science" target="_blank" rel="noopener noreferrer">
+          <img width="16" height="16" src="./asset/svg/external-link.svg" alt="external-link" />
+        </a>
+      </div>
+      <div class="certification-description">
+        <span class="certification-description2">HTML</span>
+        <span class="certification-description2">CSS</span>
+        <span class="certification-description2">Git</span>
+        <span class="certification-description2">Python</span>
+        <span class="certification-description2">Django</span>
+        <span class="certification-description2">SQL</span>
+        <span class="certification-description2">JavaScript</span>
+        <span class="certification-description2">UI</span>
+        <span class="certification-description2">CI/CD</span>
+      </div>
+    </div>
+
+    <div class="certification-container">
+      <div class="certification-head">
+        <a href="https://www.edx.org/course/cs50s-web-programming-with-python-and-javascript" target="_blank" rel="noopener noreferrer">
+          <h3>CS50's Introduction to Computer Science </h3>
+        </a>
+        <a href="https://www.edx.org/course/cs50s-web-programming-with-python-and-javascript" target="_blank" rel="noopener noreferrer">
+          <img width="16" height="16" src="./asset/svg/external-link.svg" alt="external-link" />
+        </a>
+      </div>
+      <p class="certification-description">A course on web development using Python and JavaScript.</p>
+    </div>
+
+    <div class="certification-container">
+      <div class="certification-head">
+        <a href="https://www.edx.org/course/cs50s-introduction-to-database-with-sql" target="_blank" rel="noopener noreferrer">
+          <h3>CS50's Introduction to Database with SQL</h3>
+        </a>
+        <a href="https://www.edx.org/course/cs50s-introduction-to-database-with-sql" target="_blank" rel="noopener noreferrer">
+          <img width="16" height="16" src="./asset/svg/external-link.svg" alt="external-link" />
+        </a>
+      </div>
+      <p class="certification-description">An introduction to databases and SQL.</p>
+    </div>
+  </div>
+
+  <style>
+    .certification-container {
+      transition: all 0.3s ease;
+      padding: 20px;
+      border-radius: 8px;
+      background: rgba(251, 6, 6, 0.99);
+      margin-bottom: 20px;
+    }
+
+    .certification-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .certification-description2 {
+      display: inline-block;
+      padding: 4px 8px;
+      margin: 4px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .certification-description2:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .certification-head h3 {
+      transition: color 0.3s ease;
+    }
+
+    .certification-head:hover h3 {
+      color: #4A90E2;
+    }
+  </style>
+</section>
+<!-- End of Certifications -->
+
+    <!-- About -->
+    <div class="center">
+      <div id="about">
+        <!-- Image  -->
+        <div class="about-img-container">
+          <img
+            width="80"
+            height="80"
+            src="./asset/img/pet.gif"
+            alt="pfp"
+          />
+        </div>
+        <!-- Name -->
+        <h2 class="gradient">pRANJAL mISHRA</h2>
+        <!-- social media container -->
+        <ul class="about-social-container">
+          <li>
+            <img src="./asset/svg/github.svg" alt="Github" />
+            <a href="https://github.com/erpranjalmishra">Github</a>
+          </li>
+
+          <li>
+            <img src="./asset/svg/mail.svg" alt="Mail" />
+            <a href="mailto:x@pranjalmishra.dev">Mail</a>
+          </li>
+
+          <li>
+            <img src="./asset/svg/linkedin.svg" alt="LinkedIn" />
+            <a href="https://www.linkedin.com/in/erpranjalmishra/">LinkedIn</a>
+          </li>
+        </ul>
+        <!-- long bio -->
+        <p>
+          I'm pRANJAL mISHRA,<br>a dedicated professional working on innovative projects in web development and digital solutions.  <br>
+          <br>
+        </p>
+        <!-- Skills / Tools -->
+        <h3>Skills / Tools</h3>
+        <ul class="skill">
+          <li>HTML</li>
+          <li>CSS</li>
+          <li>JavaScript</li>
+          <li>TypeScript</li>
+          <li>Python</li>
+          <li>Java</li>
+          <li>MySQL</li>
+          <li>Node.js</li>
+          <li>Django</li>
+          <li>Git</li>
+          <li>Sass</li>
+          <li>Bootstrap</li>
+        </ul>
+      </div>
+    </div><!-- Photo Gallery Section -->
+    <section id="certifications">
+      <h2>Photos</h2>
+      <div class="gallery-container">
+        <div class="gallery-item">
+          <img src="./asset/img/photo (1).jpg" alt="Project Image 1" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="./asset/img/photo (9).jpg" alt="Project Image 2" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="./asset/img/photo (16).jpg" alt="Project Image 3" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="./asset/img/photo (13).jpg" alt="Project Image 4" loading="lazy" />
+        </div>
+      </div>
+
+      <style>
+        .gallery-container {
+          display: grid;
+          gap: 1rem;
+          padding: 1rem;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        @media (min-width: 600px) {
+          .gallery-container {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (min-width: 900px) {
+          .gallery-container {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+
+        @media (min-width: 1200px) {
+          .gallery-container {
+            grid-template-columns: repeat(4, 1fr);
+          }
+        }
+
+        .gallery-item img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+      </style>
+
+      <script>
+        const galleryItems = document.querySelectorAll('.gallery-item img');
+        
+        galleryItems.forEach(item => {
+          item.addEventListener('click', () => {
+            const fullscreen = item.requestFullscreen || item.webkitRequestFullscreen;
+            fullscreen.call(item);
+          });
+        });
+      </script>
+    </section>
+    <script>
+            downloadLink.href = item.src; // Set download link to the image source
+            modal.classList.add('active');
+            document.body.classList.add('modal-open'); // Prevent body scroll
+          
+        // Close modal on close button click
+        closeModal.addEventListener('click', () => {
+          modal.classList.remove('active');
+          document.body.classList.remove('modal-open'); // Restore body scroll
+        });
+      
+        // Close modal if clicked outside the image
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.classList.remove('active');
+            document.body.classList.remove('modal-open'); // Restore body scroll
+          }
+        });
+      </script>
+      
+    </section>
+    <!-- Photo Gallery Section -->
+    <section id="project">
+      <h2>Music</h2>
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/1TRgZ55GFCKSbrTb62rmra?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe></div>
+    
+    <footer>
+      <p>
+        © <script>document.write(new Date().getFullYear());</script> Built by <a href="https://github.com/erpranjalmishra">erpranjalmishra</a>
+      </p>
+    </footer>
+
+    <script>
+      const canvas = document.getElementById('stars');
+      const ctx = canvas.getContext('2d');
+      let stars = [];
+      let numberOfStars = 200;
+      let mouse = { x: null, y: null };
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Star object
+      function Star(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.radius = Math.random() * 1.5;
+        this.opacity = Math.random();
+        this.speedX = 0;
+        this.speedY = 0;
+        this.trail = [];
+      }
+
+      // Draw star with trail
+      Star.prototype.draw = function () {
+        // Draw trail
+        for (let i = 0; i < this.trail.length; i++) {
+          ctx.beginPath();
+          ctx.arc(this.trail[i].x, this.trail[i].y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(192, 192, 192, ${1 - i / this.trail.length})`; // Silver trail
+          ctx.fill();
+        }
+
+        // Draw star
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(192, 192, 192, ${this.opacity})`; // Silver star
+        ctx.fill();
+      };
+
+      // Update star position and trail
+      Star.prototype.update = function () {
+        // Add current position to the trail
+        this.trail.unshift({ x: this.x, y: this.y });
+        if (this.trail.length > 20) {
+          this.trail.pop(); // Limit the trail length
+        }
+
+        // Move the star
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        // Fade and stop the star after interaction
+        this.speedX *= 0.98;
+        this.speedY *= 0.98;
+        this.opacity *= 0.98;
+
+        // Reset star when it fades out
+        if (this.opacity < 0.1) {
+          this.reset();
+        }
+      };
+
+      // Reset star position
+      Star.prototype.reset = function () {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.z = Math.random() * canvas.width;
+        this.radius = Math.random() * 1.5;
+        this.opacity = Math.random();
+        this.speedX = 0;
+        this.speedY = 0;
+        this.trail = [];
+      };
+
+      // Initialize stars
+      function init() {
+        stars = [];
+        for (let i = 0; i < numberOfStars; i++) {
+          stars.push(new Star(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * canvas.width));
+        }
+      }
+
+      // Animate stars
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Update and draw each star
+        for (let i = 0; i < stars.length; i++) {
+          stars[i].update();
+          stars[i].draw();
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      // Mouse movement interaction
+      window.addEventListener('mousemove', (event) => {
+        mouse.x = event.clientX;
+        mouse.y = event.clientY;
+
+        // Add movement to the stars
+        for (let i = 0; i < stars.length; i++) {
+          stars[i].speedX = (mouse.x - stars[i].x) * 0.01;
+          stars[i].speedY = (mouse.y - stars[i].y) * 0.01;
+        }
+      });
+
+      // Resize canvas on window resize
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        init();
+      });
+
+      // Initialize and animate stars
+      init();
+      animate();
+    </script>
+  </body>
+</html>
